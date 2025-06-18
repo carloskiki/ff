@@ -7,6 +7,10 @@ and this library adheres to Rust's notion of
 
 ## [Unreleased]
 
+### Changed
+- Some of the methods and constants behind the `PrimeField` trait were moved to
+    the `Field` trait, because they did not require the field to be prime.
+
 ## [0.13.1] - 2025-03-09
 ### Changed
 - `ff_derive` now works with all odd primes, not just primes that are either
