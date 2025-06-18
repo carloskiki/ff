@@ -69,7 +69,7 @@ pub trait Field:
     + for<'a> MulAssign<&'a Self>
     + From<u64> 
 {
-    /// The prime field can be converted back and forth into this binary
+    /// The field can be converted back and forth into this binary
     /// representation.
     type Repr: Copy + Default + Send + Sync + 'static + AsRef<[u8]> + AsMut<[u8]>;
     
@@ -82,7 +82,7 @@ pub trait Field:
     /// Modulus of the field written as a string for debugging purposes.
     ///
     /// The encoding of the modulus is implementation-specific. Generic users of the
-    /// `PrimeField` trait should treat this string as opaque.
+    /// `Field` trait should treat this string as opaque.
     const MODULUS: &'static str;
 
     /// How many bits are needed to represent an element of this field.
@@ -212,7 +212,7 @@ pub trait Field:
         res
     }
 
-    /// Interpret a string of numbers as a (congruent) prime field element.
+    /// Interpret a string of numbers as a (congruent) field element.
     /// Does not accept unnecessary leading zeroes or a blank string.
     ///
     /// # Security
@@ -277,7 +277,7 @@ pub trait Field:
     }
 
     /// Attempts to convert a byte representation of a field element into an element of
-    /// this prime field, failing if the input is not canonical (is not smaller than the
+    /// this field, failing if the input is not canonical (is not smaller than the
     /// field's modulus).
     ///
     /// The byte representation is interpreted with the same endianness as elements
@@ -285,7 +285,7 @@ pub trait Field:
     fn from_repr(repr: Self::Repr) -> CtOption<Self>;
 
     /// Attempts to convert a byte representation of a field element into an element of
-    /// this prime field, failing if the input is not canonical (is not smaller than the
+    /// this field, failing if the input is not canonical (is not smaller than the
     /// field's modulus).
     ///
     /// The byte representation is interpreted with the same endianness as elements
@@ -299,7 +299,7 @@ pub trait Field:
         Self::from_repr(repr).into()
     }
 
-    /// Converts an element of the prime field into the standard byte representation for
+    /// Converts an element of the field into the standard byte representation for
     /// this field.
     ///
     /// The endianness of the byte representation is implementation-specific. Generic
