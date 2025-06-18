@@ -67,12 +67,34 @@ pub trait Field:
     + for<'a> AddAssign<&'a Self>
     + for<'a> SubAssign<&'a Self>
     + for<'a> MulAssign<&'a Self>
+    + From<u64> 
 {
+    /// The prime field can be converted back and forth into this binary
+    /// representation.
+    type Repr: Copy + Default + Send + Sync + 'static + AsRef<[u8]> + AsMut<[u8]>;
+    
     /// The zero element of the field, the additive identity.
     const ZERO: Self;
 
     /// The one element of the field, the multiplicative identity.
     const ONE: Self;
+    
+    /// Modulus of the field written as a string for debugging purposes.
+    ///
+    /// The encoding of the modulus is implementation-specific. Generic users of the
+    /// `PrimeField` trait should treat this string as opaque.
+    const MODULUS: &'static str;
+
+    /// How many bits are needed to represent an element of this field.
+    const NUM_BITS: u32;
+
+    /// How many bits of information can be reliably stored in the field element.
+    ///
+    /// This is usually `Self::NUM_BITS - 1`.
+    const CAPACITY: u32;
+
+    /// Inverse of $2$ in the field.
+    const TWO_INV: Self;
 
     /// Returns an element chosen uniformly at random using a user-provided RNG.
     fn random(rng: impl RngCore) -> Self;
@@ -189,13 +211,6 @@ pub trait Field:
 
         res
     }
-}
-
-/// This represents an element of a non-binary prime field.
-pub trait PrimeField: Field + From<u64> {
-    /// The prime field can be converted back and forth into this binary
-    /// representation.
-    type Repr: Copy + Default + Send + Sync + 'static + AsRef<[u8]> + AsMut<[u8]>;
 
     /// Interpret a string of numbers as a (congruent) prime field element.
     /// Does not accept unnecessary leading zeroes or a blank string.
@@ -300,23 +315,10 @@ pub trait PrimeField: Field + From<u64> {
         !self.is_odd()
     }
 
-    /// Modulus of the field written as a string for debugging purposes.
-    ///
-    /// The encoding of the modulus is implementation-specific. Generic users of the
-    /// `PrimeField` trait should treat this string as opaque.
-    const MODULUS: &'static str;
+}
 
-    /// How many bits are needed to represent an element of this field.
-    const NUM_BITS: u32;
-
-    /// How many bits of information can be reliably stored in the field element.
-    ///
-    /// This is usually `Self::NUM_BITS - 1`.
-    const CAPACITY: u32;
-
-    /// Inverse of $2$ in the field.
-    const TWO_INV: Self;
-
+/// This represents an element of a non-binary prime field.
+pub trait PrimeField: Field {
     /// A fixed multiplicative generator of `modulus - 1` order. This element must also be
     /// a quadratic nonresidue.
     ///
